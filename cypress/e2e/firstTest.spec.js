@@ -89,7 +89,7 @@ describe("Saving subject of the command", () => {
   });
 });
 
-describe.only("Invoke Command", () => {
+describe("Invoke Command", () => {
   it("using the invoke command (attributes)", () => {
     cy.visit("/");
     cy.contains("Forms").click();
@@ -129,7 +129,7 @@ describe.only("Invoke Command", () => {
       });
   });
 
-  it.only("using invoke on a datepicker property", () => {
+  it("using invoke on a datepicker property", () => {
     // in this case we need to use the property of the html element, as the selected date is not available in the DOM
     // the selected date in the input is saved in the "value" property of the input html element
     cy.visit("/");
@@ -149,3 +149,55 @@ describe.only("Invoke Command", () => {
       });
   });
 });
+
+describe.only("checkboxes and radio buttons", () => {
+    it('radio button', () => {
+        cy.visit("/");
+        cy.contains("Forms").click();
+        cy.contains("Form Layouts").click();
+
+        cy.contains('nb-card', 'Using the Grid').find('[type="radio"]').then( radioButtons => {
+            cy.wrap(radioButtons)
+                .first()
+                .check({force: true})
+                .should('be.checked')
+
+            cy.wrap(radioButtons)
+                .eq(1)
+                .check({force: true})
+                .should('be.checked')
+            
+            cy.wrap(radioButtons)
+                .eq(0)
+                .should('not.be.checked')
+
+            cy.wrap(radioButtons)
+                .eq(2)
+                .should('be.disabled')
+        })
+    })
+
+    it.only('checkboxes', () => {
+        cy.visit("/");
+        cy.contains("Modal & Overlays").click();
+        cy.contains("Toastr").click();
+
+        // cy.get('[type="checkbox"]').check({ force: true })
+        // the above line will make sure to match all the checkboxes on the page, and it checks only those that were unchecked. 
+        // Suppose we had three checkboxes, out of which two were already checked, the above command will only check the one checkbox
+        // that was unchecked. To uncheck checkboxes we need to use the click command instead of the check. 
+        
+        // when using click it will only click on one checkbox at a time instead of like the check where it looped over all of the checkboxes.
+        // so this will not work
+        // cy.get('[type="checkbox"]').click({ force: true })
+
+        // whereas the below will work -  this will check the unchecked checkbox
+        cy.get('[type="checkbox"]').eq(1).click({ force: true })
+
+        // and the below will uncheck a checked checkbox
+        cy.get('[type="checkbox"]').eq(0).click({ force: true })
+
+        // in short check will only work with input buttons that are of type "radio" or "checkbox". It will not work on any other element.
+        // check method can only check your checkboxes and cannot uncheck. It can also be applied to multiple checkboxes
+    })
+})

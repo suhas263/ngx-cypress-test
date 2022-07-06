@@ -150,7 +150,7 @@ describe("Invoke Command", () => {
   });
 });
 
-describe.only("checkboxes and radio buttons", () => {
+describe("checkboxes and radio buttons", () => {
     it('radio button', () => {
         cy.visit("/");
         cy.contains("Forms").click();
@@ -177,7 +177,7 @@ describe.only("checkboxes and radio buttons", () => {
         })
     })
 
-    it.only('checkboxes', () => {
+    it('checkboxes', () => {
         cy.visit("/");
         cy.contains("Modal & Overlays").click();
         cy.contains("Toastr").click();
@@ -199,5 +199,47 @@ describe.only("checkboxes and radio buttons", () => {
 
         // in short check will only work with input buttons that are of type "radio" or "checkbox". It will not work on any other element.
         // check method can only check your checkboxes and cannot uncheck. It can also be applied to multiple checkboxes
+    })
+})
+
+describe.only("Lists and dropdowns", () => {
+    it("list and dropdown", () => {
+        cy.visit("/")
+
+        // 1.
+        // manually check validation for each case when there is only one
+        // cy.get('nav nb-select').click()
+        // cy.get('.options-list').contains('Dark').click()
+        // cy.get('nav nb-select').should('contain', 'Dark')
+        // cy.get('nb-layout-header nav').should('have.css', 'background-color', 'rgb(34, 43, 69)')
+
+        // 2.
+        // when there are more than one option to check it is better to loop over the items
+        cy.get('nav nb-select').then( dropdown => {
+            cy.wrap(dropdown).click()
+            cy.get('.options-list nb-option').each( (listItem, index) => {
+                const itemText = listItem.text().trim()
+
+                const colors= {
+                    "Light": "rgb(255, 255, 255)",
+                    "Dark": "rgb(34, 43, 69)",
+                    "Cosmic": "rgb(50, 50, 89)",
+                    "Corporate": "rgb(255, 255, 255)",
+                }
+
+                cy.wrap(listItem).click()
+                cy.get('nav nb-select').should('contain', itemText)
+                cy.get('nb-layout-header nav').should('have.css', 'background-color', colors[itemText])
+
+                if(index < 3) {
+                    cy.wrap(dropdown).click()
+                }
+            })
+        })
+
+        // 3. the third method is by using "cy select", https://docs.cypress.io/api/commands/select
+        // this can only be used when there is "select" element in the DOM 
+        // in this example the element is named "nb-select" instead of "select" and hence we cannot use this 
+        
     })
 })

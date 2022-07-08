@@ -1,3 +1,5 @@
+const { exit } = require("process");
+
 describe("First test suite", () => {
   it("my first test", () => {
     cy.visit("/");
@@ -202,7 +204,7 @@ describe("checkboxes and radio buttons", () => {
     })
 })
 
-describe.only("Lists and dropdowns", () => {
+describe("Lists and dropdowns", () => {
     it("list and dropdown", () => {
         cy.visit("/")
 
@@ -240,6 +242,52 @@ describe.only("Lists and dropdowns", () => {
         // 3. the third method is by using "cy select", https://docs.cypress.io/api/commands/select
         // this can only be used when there is "select" element in the DOM 
         // in this example the element is named "nb-select" instead of "select" and hence we cannot use this 
+
+    })
+})
+
+describe.only('Web Tables', () => {
+    it('verify the value entered in a table column is correct', () => {
+        cy.visit("/");
+        cy.contains("Tables & Data").click();
+        cy.contains("Smart Table").click();
+
+        // 1
+        // target the main table body and select the column that we want to work with
+        // once we know the column, we save the context of the table column and then work with it
+        cy.get('tbody').contains('tr', 'John').then( tableColumn => {
+            cy.wrap(tableColumn).find('.nb-edit').click()
+            cy.wrap(tableColumn).find('[placeholder="Age"]').clear().type('30')
+            cy.wrap(tableColumn).find('.nb-checkmark').click()
+            // we don't have a unique class or attribute for the various columns within a row
+            // instead since the columns are consistent we use the index/order of the columns and then verify the text value 
+            cy.wrap(tableColumn).find('td').eq(6).should('have.text', '30')
+        })
+    })
+
+    it.only('verify the search returns the correct results', () => {
+        const ages = ['15', '20', '30'];
+        cy.visit("/");
+        cy.contains("Tables & Data").click();
+        cy.contains("Smart Table").click();
+
+
+        // to check single age
+        // cy.get('thead [placeholder="Age"]').clear().type(20);
+        // cy.get('tbody tr').each( tableRows => {
+        //     if(tableRows.length != 0){
+        //         cy.wrap(tableRows).find('td').eq(6).should('have.text', 20)
+        //     }
+        // })
         
+        // looping through an array of age
+        cy.wrap(ages).each( age => {
+            cy.get('thead [placeholder="Age"]').clear().type(age);
+            cy.wait(500);
+
+            cy.get('tbody tr').each( tableRow => {
+                cy.wrap(tableRow).find('td').eq(6).should('have.text', age)
+            })
+        })
     })
 })

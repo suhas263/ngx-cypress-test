@@ -246,7 +246,7 @@ describe("Lists and dropdowns", () => {
     })
 })
 
-describe.only('Web Tables', () => {
+describe('Web Tables', () => {
     it('verify the value entered in a table column is correct', () => {
         cy.visit("/");
         cy.contains("Tables & Data").click();
@@ -265,7 +265,7 @@ describe.only('Web Tables', () => {
         })
     })
 
-    it.only('verify the search returns the correct results', () => {
+    it('verify the search returns the correct results', () => {
         const ages = ['15', '20', '30'];
         cy.visit("/");
         cy.contains("Tables & Data").click();
@@ -290,4 +290,60 @@ describe.only('Web Tables', () => {
             })
         })
     })
+})
+
+describe.only('Web Datepickers', () => {
+    // existing test that we used in the invoke section
+    // it("using invoke on a datepicker property", () => {
+    //     // in this case we need to use the property of the html element, as the selected date is not available in the DOM
+    //     // the selected date in the input is saved in the "value" property of the input html element
+    //     cy.visit("/");
+    //     cy.contains("Forms").click();
+    //     cy.contains("Datepicker").click();
+    
+    //     cy.contains("nb-card", "Common Datepicker")
+    //       .find("input")
+    //       .then((inputEl) => {
+    //         // wrapping the jquery element to make is cypress chainable
+    //         cy.wrap(inputEl).click();
+    //         cy.get("nb-calendar-picker").contains("1").click();
+    
+    //         cy.wrap(inputEl)
+    //           .invoke("prop", "value")
+    //           .should("contain", "Jul 1, 2022");
+    //       });
+    //   });
+
+    // the above test has a drawback of using static test data and hence will fail when we run the test during another time frame
+    // below we will dynamically select the date based on the current date
+    it("use the current date to assert dynamic date selection", () => {
+        cy.visit("/");
+        cy.contains("Forms").click();
+        cy.contains("Datepicker").click();
+
+        let date = new Date(); //  Mon Jul 11 2022 12:37:43 GMT+0200 (Central European Summer Time)
+        // date.setDate(date.getDate()) // 1657535923021 
+        // date.setDate(date.getDate() + 2) // 1657708723021
+        date.setDate(date.getDate() + 2)
+        cy.log(date) // Wed Jul 13 2022 12:37:43 GMT+0200 (Central European Summer Time)
+        let futureDay = date.getDay() // 3 (Sunday - Saturday : 0 - 6)
+        let futureDate = date.getDate() // 13
+        let futureMonth = date.getMonth() // 6 ( Jan - Dec : 0 - 11)
+        futureMonth = date.toLocaleString('default', { month: 'short' }) // Jul  
+        // check more options here: (https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Intl/DateTimeFormat/DateTimeFormat)
+        let assertDate = `${futureMonth} ${futureDate}, ${date.getFullYear()}`
+        cy.log(assertDate);
+
+        cy.contains("nb-card", "Common Datepicker")
+          .find("input")
+          .then((inputEl) => {
+            // wrapping the jquery element to make is cypress chainable
+            cy.wrap(inputEl).click();
+            cy.get("nb-calendar-picker").contains(futureDate).click();
+    
+            cy.wrap(inputEl)
+              .invoke("prop", "value")
+              .should("contain", assertDate);
+          });
+      });
 })

@@ -292,7 +292,7 @@ describe('Web Tables', () => {
     })
 })
 
-describe.only('Web Datepickers', () => {
+describe('Web Datepickers', () => {
     // existing test that we used in the invoke section
     // it("using invoke on a datepicker property", () => {
     //     // in this case we need to use the property of the html element, as the selected date is not available in the DOM
@@ -361,4 +361,60 @@ describe.only('Web Datepickers', () => {
               .should("contain", assertDate);
           });
       });
+})
+
+describe.only('Pop-ups and tooltips', () => {
+    it('verify the tooltip text', () => {
+        cy.visit('/');
+        cy.contains('Modal & Overlays').click()
+        cy.contains('Tooltip').click()
+    
+        cy.contains('nb-card', 'Colored Tooltips').find('button').eq(0).then(button => {
+            cy.wrap(button).should('have.text', 'Default');
+            // triggering an event listenter like the mouseenter/mouseover etc
+            // this will work only if the application was programmed to trigger such events
+            cy.wrap(button).trigger('mouseenter').then(() => {
+                cy.get('nb-tooltip').should('contain', 'This is a tooltip')
+            })
+        })
+    })
+
+    it.only('dialog boxes', () => {
+        cy.visit('/');
+        cy.contains('Tables & Data').click()
+        cy.contains('Smart Table').click()
+
+        // normal dialog boxes are easy to work with as they are like working with any other elements
+        // wait for them to appear and then assert the selector and text within them
+        // however certain dialog boxes like the browser alert dialog boxes are harder to work with as we need to have access to the browser window object
+        // cy.get('nb-card-body tbody').find('tr').eq(0).find('.nb-trash').click()
+
+        // in the above line we can find cypress automatically confirms the option on the alert box without asking for an input. 
+        // This is because cypress is configured to automatically confirm the action on these dialog boxes
+
+        // 1
+        // To get around this and make sure we can assert the text in the alert dialog box 
+        // can either use window:confirm or window:alert here for the on event
+        // cy.on('window:confirm', (confirm) => {
+        // // the code in this block will only execute if the "window:confirm" event was triggered, but if not this will never run
+        //     expect(confirm).to.equal('Are you sure you want to delete?')
+        // })
+
+        // 2
+        // const stub = cy.stub();
+        // cy.on('window:confirm', stub)
+        // cy.get('nb-card-body tbody').find('tr').eq(0).find('.nb-trash').click().then(() => {
+        //     expect(stub.getCall(0)).to.be.calledWith('Are you sure you want to delete?')
+        // })
+        // the adv of using the 2 approach is that in case the window:confirm event is not triggered, the stub will be set to an empty object 
+        // so when making the getCall on the stub we will not have any message
+
+        // 3
+        // In case we want to cancel the action on such alert dialog boxes we need to use a work around
+        // this will ensure that cypress automatically selects the false option (cancel)
+        cy.get('nb-card-body tbody').find('tr').eq(0).find('.nb-trash').click()
+        cy.on('window:confirm', () => false)
+
+    })
+
 })

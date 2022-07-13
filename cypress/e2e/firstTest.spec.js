@@ -363,7 +363,7 @@ describe('Web Datepickers', () => {
       });
 })
 
-describe.only('Pop-ups and tooltips', () => {
+describe('Pop-ups and tooltips', () => {
     it('verify the tooltip text', () => {
         cy.visit('/');
         cy.contains('Modal & Overlays').click()
@@ -416,5 +416,55 @@ describe.only('Pop-ups and tooltips', () => {
         cy.on('window:confirm', () => false)
 
     })
+
+})
+
+describe.only('Cypress Assertions', () => {
+    // Cypress assertions - https://docs.cypress.io/guides/references/assertions
+    // 3 main types
+
+    // 1. BDD Assertions - https://docs.cypress.io/guides/references/assertions#BDD-Assertions
+    // These are used for expect/should general cases, like asserting a name to equal something, or expecting an object to contain 
+    // a property etc. 
+        // expect(name).to.not.equal('Jane')    
+        // expect(arr).to.have.any.keys('age')
+        // expect('test').to.have.ownProperty('length')
+        
+        // some of the chainable getters are as follows:
+        // to, be, been, is, that, which, and, has, have, with, at, of, same
+
+    // 2. TDD Assertions - https://docs.cypress.io/guides/references/assertions#TDD-Assertions
+    //  these start with keyword assert. We can instead use chai and BDD to get around most use cases
+        // assert.isOk('everything', 'everything is ok')
+        // assert.notDeepEqual({ id: '1' }, { id: '2' })
+
+    // 3. Chai Jquery - https://docs.cypress.io/guides/references/assertions#Chai-jQuery
+    // these are mainly used to assert something about a DOM object. These are mainly used along with cy.get() and cy.contains()
+    // here the expect takes an element as a parameter
+        // expect($el).to.have.attr('foo', 'bar')
+        // expect($el).to.have.class('foo')
+        // expect($el).to.be.visible
+
+    // when using a "".should" chainer, we normally use the chai jquery syntax like should('have.class', 'foo')
+    // we can also chain two should chainers on any elements
+    //  e.g: 
+        // cy.get('[selector]')
+        //  .should('contain', 'Email address')
+        //  .should('have.class', 'foo')
+        //  .and('have.text', 'Exact text')
+
+    // 
+        // cy.wrap(inputEl)
+        // .invoke("prop", "value")
+        // .should("contain", assertDate);
+
+    // the above can also be reduced 
+        //  cy.wrap(inputEl)
+        // .should("have.value", assertDate);
+});
+});
+
+    // 4. Sinon-Chai
+    // These are mainly used with cy.stub() and cy.spy(), more widely used for unit testing
 
 })
